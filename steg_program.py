@@ -37,17 +37,71 @@ class LSBprog():
             """
         return msg
     
-    def get_ext_code(self,ext):
+    def get_ext_code(self,ext,reverse=False):
         ext_dict = {
-            'jpg':'000',
-            'png':'001'
+            'jpg':'0000',
+            'png':'0001',
+            'msg':'0010'
         }
-        return ext_dict[ext]
-    
+        if not reverse:
+            return ext_dict[ext]
+        else:
+            for key,value in ext_dict.items():
+                if value == ext:
+                    return key
+
+    def convert_to_bytestring(self,data):
+
+        hidden_data = bytes([int(data[i:i+8], 2) for i in range(0, len(data), 8)])
+        return hidden_data
+        
+
+    def decode(self):
+        hidden_obj_header = ""
+        hidden_obj = ""
+        bit_length = -1
+        i = 0
+        write_obj = False
+        for pixel in self.array:
+            for channel in pixel:
+                if i == 32: 
+                    file_format = self.get_ext_code(hidden_obj_header[:4],True)
+                    bit_length = int(hidden_obj_header[4:32],2)
+                    write_obj = True
+
+                if not write_obj: # ak spracovavame header
+                    hidden_obj_header += bin(channel%2)[2:]
+                
+                if write_obj: # ak uz spracovavame tajnu spravu
+                    if i == 32 + bit_length:
+                        hidden_data = self.convert_to_bytestring(hidden_obj)
+                        if file_format == 'msg': # skryté správy sa vypíšu do konzoly
+                            print(f"the hidden message is: {hidden_data.decode('utf-8')}")
+                        else:
+                            
+                            uncovered_obj = open(f"uncovered.{file_format}","wb")
+                            uncovered_obj.write(hidden_data)
+                            print("the hidden file was recovered\n")
+                            return
+                    hidden_obj += bin(channel%2)[2:]
+
+                
+                
+                i += 1
+                
+            
+        print("ahoj")
+        
+        
+
+
+
     def encode(self,data, data_type):
         
         if data_type == 'msg':
             hidden_obj = data.encode('utf8')
+            ext_code = self.get_ext_code('msg')
+
         elif data_type == 'img':
             f_type = data.split(".")[1]             # get the extension
             ext_code = self.get_ext_code(f_type)    # get the extension code
@@ -61,7 +115,7 @@ class LSBprog():
             return
 
 
-        hidden_obj_metadata = '1' + ext_code +  ('{0:028b}'.format(len(hidden_obj)*8)) #build the header, first 1 bit (message,image), 3 bit (extension), 28 bit (number of bits hidden)
+        hidden_obj_metadata = ext_code +  ('{0:028b}'.format(len(hidden_obj)*8)) #build the header, first 1 bit (message,image), 3 bit (extension), 28 bit (number of bits hidden)
         object_bits = ''.join(format(byte, '08b') for byte in hidden_obj)
         object_bits = hidden_obj_metadata + object_bits
         
@@ -76,7 +130,11 @@ class LSBprog():
                 except IndexError: #pls dont kill me
                     self.array=self.array.reshape(self.height, self.width, self.channels)
                     enc_img = Image.fromarray(self.array.astype('uint8'), self.cover.mode)
-                    enc_img.save("neviem.png")
+                    enc_img.save("stego_object.png")
+                    print("The hidden data was inserted into the cover object to the file: stego_object.png")
+
+
+
                     return
 
                 
@@ -128,7 +186,14 @@ if __name__ == '__main__':
     args_verify(args)
 
     src = LSBprog(args.cover)
-    src.encode(args.file,'img')
+    if args.decode:
+        src.decode()
+
+    if args.message: 
+
+        src.encode(args.message,'msg')
+    else:
+        src.encode(args.file,'img')
     if args.capacity == True:
         print(src.get_capacity())
 

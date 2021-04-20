@@ -1,0 +1,47 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Decode",
+            "type": "python",
+            "request": "launch",
+            "program": "steg_program.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "stego_object.png",
+                "--decode",
+                
+            ],
+        },
+        {
+            "name": "Python: Message",
+            "type": "python",
+            "request": "launch",
+            "program": "steg_program.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "instagram.png",
+                "-m",
+                "ahoj"
+            ],
+        },
+        {
+            "name": "Python: Image",
+            "type": "python",
+            "request": "launch",
+            "program": "steg_program.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "instagram.png",
+                "-f",
+                "hidden.jpg"
+            ],
+        }
+    ]
+}
