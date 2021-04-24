@@ -5,8 +5,6 @@ from PIL import Image
 import numpy as np
 
 
-class LSBexception(Exception):
-    pass
 
 #
 class LSBprog():
@@ -41,7 +39,8 @@ class LSBprog():
         ext_dict = {
             'jpg':'0000',
             'png':'0001',
-            'msg':'0010'
+            'msg':'0010',
+            'mp3':'0100'
         }
         if not reverse:
             return ext_dict[ext]
@@ -90,8 +89,7 @@ class LSBprog():
                 i += 1
                 
             
-        print("ahoj")
-        
+     
         
 
 
@@ -99,8 +97,8 @@ class LSBprog():
     def encode(self,data, data_type):
         
         if data_type == 'msg':
-            hidden_obj = data.encode('utf8')
-            ext_code = self.get_ext_code('msg')
+            hidden_obj = data.encode('utf8')        # encode the message
+            ext_code = self.get_ext_code('msg')     # there is no extension in a message, but we need to define a virtual one
 
         elif data_type == 'img':
             f_type = data.split(".")[1]             # get the extension
@@ -183,7 +181,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
 
-    args_verify(args)
+ 
 
     src = LSBprog(args.cover)
     if args.decode:
@@ -192,7 +190,7 @@ if __name__ == '__main__':
     if args.message: 
 
         src.encode(args.message,'msg')
-    else:
+    if args.file:
         src.encode(args.file,'img')
     if args.capacity == True:
         print(src.get_capacity())
@@ -200,7 +198,7 @@ if __name__ == '__main__':
 
 
     
-    print(args)
+   
 
 
 
