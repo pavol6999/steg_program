@@ -5,14 +5,13 @@ from PIL import Image
 import numpy as np
 
 
-
 #
 class LSBprog():
     def __init__(self, cover_object):
         self.cover = Image.open(cover_object,'r')
         self.width, self.height = self.cover.size
-        self.array = np.array(list(self.cover.getdata()))
         self.channels = self.get_channels()
+        self.array = np.array(list(self.cover.getdata()))
         self.capacity = self.channels * self.height * self.width
 
     def change_last_bit(self,byte):
@@ -23,12 +22,19 @@ class LSBprog():
             return 3         
         elif self.cover.mode == 'RGBA':
             return 4
+        elif self.cover.mode == ('P' or 'L' or 'PA' or 'LA'):
+            print("Cover is an indexed image with a color palette\n Do you wish to convert it to RGB?\n")
+            if input("y/n: ").lower() == 'y':
+                self.cover=self.cover.convert("RGB")
+                return 3
+            else:
+                exit()
         else:
-            print("Unsupported")
-
+            print("Unsupported image type")
+            exit()
     def get_capacity(self):
         msg = f"""
-            You can hide up to {self.capacity} bits in the cover object {self.cover.filename}\n
+            You can hide up to {self.capacity} bits in the cover object\n
             B ~ {self.capacity/8}
             KB ~ {self.capacity/(8*1024)}
             MB ~ {self.capacity/(8*1024*1024)}
@@ -40,7 +46,8 @@ class LSBprog():
             'jpg':'0000',
             'png':'0001',
             'msg':'0010',
-            'mp3':'0100'
+            'mp3':'0100',
+            'pdf':'0101'
         }
         if not reverse:
             return ext_dict[ext]
@@ -129,7 +136,7 @@ class LSBprog():
                     self.array=self.array.reshape(self.height, self.width, self.channels)
                     enc_img = Image.fromarray(self.array.astype('uint8'), self.cover.mode)
                     enc_img.save("stego_object.png")
-                    print("The hidden data was inserted into the cover object to the file: stego_object.png")
+                    print("The hidden data was inserted into the cover object to file: stego_object.png")
 
 
 

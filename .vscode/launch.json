@@ -5,6 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Python: Capacity",
+            "type": "python",
+            "request": "launch",
+            "program": "steg_program.py",
+            "console": "integratedTerminal",
+            "args": [
+                "-c",
+                "cover_Indexed.png",
+                "--capacity",
+                
+            ],
+        },
+        {
             "name": "Python: Decode",
             "type": "python",
             "request": "launch",
@@ -38,9 +51,9 @@
             "console": "integratedTerminal",
             "args": [
                 "-c",
-                "instagram.png",
+                "cover_Indexed.png",
                 "-f",
-                "hidden.jpg"
+                "xkrajkovic_steganogaphy.pdf"
             ],
         }
     ]
