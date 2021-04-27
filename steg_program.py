@@ -48,6 +48,7 @@ class LSBprog():
             'msg':'0010',
             'mp3':'0100',
             'pdf':'0101'
+            
         }
         if not reverse:
             return ext_dict[ext]
